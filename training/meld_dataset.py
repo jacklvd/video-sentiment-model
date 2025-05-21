@@ -113,7 +113,7 @@ class MELDDataset(Dataset):
                 sample_rate=16000,
                 n_fft=1024,
                 win_length=400,
-                hop_length=160,
+                hop_length=512,
                 n_mels=64,
             )(waveform)
 
@@ -174,8 +174,8 @@ class MELDDataset(Dataset):
                 },
                 "video_frames": video_frames,
                 "audio_features": audio_features,
-                "emotion_labels": torch.tensor(emotion, dtype=torch.long),
-                "sentiment_labels": torch.tensor(sentiment, dtype=torch.long),
+                "emotion_labels": torch.tensor(emotion),
+                "sentiment_labels": torch.tensor(sentiment),
             }
         except Exception as e:
             print(f"Error processing item {video_path}: {str(e)}")
@@ -189,13 +189,14 @@ def collate_fn(batch):
 
 def prepare_dataloader(csv_path, video_dir, batch_size=32, num_workers=4):
     dataset = MELDDataset(csv_path, video_dir)
-    return DataLoader(
+    data_loder = DataLoader(
         dataset,
         batch_size=batch_size,
         shuffle=True,
         num_workers=num_workers,
         collate_fn=collate_fn,
     )
+    return data_loder
 
 
 if __name__ == "__main__":
